@@ -1,0 +1,21 @@
+(run)
+((run))
+(boot (run))
+(-> boot run)
+(-> boot (run))
+(boot (run))
+(reload!)
+(reload)
+(reset)
+(require '[clojure.tools.namespace.repl :as repl])
+exit
+(repl/reload)
+(repl/refresh)
+ (get-env :directories)
+(boot (run))
+exit
+(repl/refresh)
+exit
+(boot (pom) (jar) (install))
+ls
+exit
