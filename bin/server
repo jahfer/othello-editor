@@ -1,7 +1,0 @@
-#!/bin/bash
-echo "---------Starting Server---------"
-echo "Starting server on :8000"
-echo "REPL available on :8001"
-java -Xmx512M -jar -Dhttp.port=8000 -Drepl.port=8001 target/project.jar
-echo
-echo "---------Server Killed---------"

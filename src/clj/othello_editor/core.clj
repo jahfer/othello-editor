@@ -4,7 +4,7 @@
             [reloaded.repl :refer [set-init! go]]))
 
 (defn -main
-  "Start a production system, unless a system is passed as argument (as in the dev-run task)."
+  "Start a production system, unless a system is passed as argument."
   [& args]
   (let [candidate (first args)
         system (condp #(%1 %2) candidate

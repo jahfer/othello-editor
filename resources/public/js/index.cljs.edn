@@ -1,0 +1,4 @@
+{:require [othello-editor.app]
+ :init-fns [othello-editor.app/run]
+ :compiler-options {:asset-path "js/index.out"}}
+
