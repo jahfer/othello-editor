@@ -1,22 +1,38 @@
 (ns othello-editor.app
-  (:require [cljs.core.async :as async :refer (<! >! put! chan)]
-            [clojure.string :as str]
-            [clojure.string :as string]
-            [reagent.core :as reagent]
-            [re-frame.core :refer [register-handler
-                          path
+  (:require
+   [cljs.core.async :as async :refer (<! >! put! chan)]
+   [clojure.string :as str]
+   [reagent.core :as reagent]
+   [re-frame.core :refer [register-handler
                           register-sub
                           dispatch
                           dispatch-sync
-                                   subscribe]]
-            [taoensso.encore :as enc :refer (tracef debugf infof warnf errorf)]
-            [taoensso.sente :as sente :refer (cb-success?)]
-            [taoensso.sente.packers.transit :as sente-transit])
+                          subscribe]]
+   [taoensso.encore :as enc :refer (tracef debugf infof warnf errorf)]
+   [taoensso.sente :as sente :refer (cb-success?)]
+   [taoensso.sente.packers.transit :as sente-transit]
+   [othello-editor.components.editor :refer [editor]])
   (:require-macros
    [cljs.core.async.macros :as acyncm :refer (go go-loop)]
    [reagent.ratom :refer (reaction)]))
 
-(def initial-state {:counter 1 :title "Hello"})
+(def initial-state {:counter 1
+                    :title "Hello"
+                    :editor {:active-author-id nil
+                             :authors {}
+                             :block-order ["123-abc" "456-def"]
+                             :blocks {"123-abc" {:block/id "123-abc"
+                                                 :block/type :block-type/title
+                                                 :block/body "Victory!"
+                                                 :block/attributes []}
+                                      "456-def" {:block/id "456-def"
+                                                 :block/type :block-type/text
+                                                 :block/body "Hello world, it's me."
+                                                 :block/attributes [[[0 5]] ;; ewwww
+                                                                    [[6 10] {:bold true}]
+                                                                    [[11 17]]
+                                                                    [[18 19] {:underline true}]
+                                                                    [[20 20]]]}}}})
 
 ;; handlers
 (register-handler
@@ -24,31 +40,10 @@
  (fn [db _]
    (merge db initial-state)))
 
-(register-handler
- :inc
- (fn [db _]
-   (update db :counter inc)))
-
-;; subscription handlers
-(register-sub
- :inc
- (fn [db _]
-   (reaction (:counter @db))))
-
-;; view components
-(defn counter
-  []
-  (let [count (subscribe [:inc])]
-    (fn counter-render [_]
-      [:div
-       [:p (str/join ["The counter is currently at " @count])]
-       [:button {:on-click #(dispatch [:inc])} "Click"]])))
-
 (defn root
   []
   [:div
-   [:h1 "Hello!"]
-   [counter]])
+   [editor]])
 
 ;; public interface
 (defn run
