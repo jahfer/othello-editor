@@ -23,16 +23,13 @@
                              :block-order ["123-abc" "456-def"]
                              :blocks {"123-abc" {:block/id "123-abc"
                                                  :block/type :block-type/title
-                                                 :block/body "Victory!"
+                                                 :block/body "My Document"
                                                  :block/attributes []}
                                       "456-def" {:block/id "456-def"
                                                  :block/type :block-type/text
-                                                 :block/body "Hello world, it's me."
-                                                 :block/attributes [[[0 5]] ;; ewwww
-                                                                    [[6 10] {:bold true}]
-                                                                    [[11 17]]
-                                                                    [[18 19] {:underline true}]
-                                                                    [[20 20]]]}}}})
+                                                 :block/body "Hello world, it's me!"
+                                                 :block/attributes [[[6 11] {:bold true}]
+                                                                    [[18 20] {:underline true}]]}}}})
 
 ;; handlers
 (register-handler

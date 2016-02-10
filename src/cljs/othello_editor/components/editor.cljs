@@ -23,6 +23,25 @@
     italic    (assoc :font-style      "italic")
     underline (assoc :text-decoration "underline")))
 
+(defn styles->spans [body attributes]
+  (let [last-end* (atom 0)]
+    (->> attributes
+         (reduce
+          (fn [acc [[start end] styles]]
+            (let [last-end    @last-end*
+                  filler-row  [:span (subs body last-end start)]
+                  current-row [:span {:style (styles-from-attributes styles)} (subs body start end)]]
+              (reset! last-end* end)
+              (cond-> acc
+                (not= start last-end) (conj filler-row)
+                true                  (conj current-row))))
+          (list))
+         ((fn [nodes]
+            (if (> (count body) @last-end*)
+              (conj nodes [:span (subs body @last-end* (count body))])
+              nodes)))
+         (reverse))))
+
 ;; ----
 
 (register-sub
@@ -45,8 +64,10 @@
 (defn text-node [id attributes body]
   [:p {:contentEditable true
        :on-input (handle-input id)}
-   (for [[[start end] styles] attributes]
-     ^{:key [id start end]} [:span {:style (styles-from-attributes styles)} (subs body start (inc end))])])
+   (styles->spans body attributes)])
+
+;; (for [[[start end] styles] attributes]
+;;   ^{:key [id start end]} [:span {:style (styles-from-attributes styles)} (subs body start end)])
 
 (defn title-node [id attributes body]
   [:h1 {:contentEditable true
