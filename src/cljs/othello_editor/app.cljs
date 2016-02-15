@@ -18,8 +18,9 @@
 
 (def initial-state {:counter 1
                     :title "Hello"
-                    :editor {:active-author-id nil
-                             :authors {}
+                    :editor {:active-author-id "user1"
+                             :authors {"user1" {:active-block-id nil
+                                                :cursor-offset 0}}
                              :block-order ["123-abc" "456-def"]
                              :blocks {"123-abc" {:block/id "123-abc"
                                                  :block/type :block-type/title
