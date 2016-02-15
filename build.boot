@@ -15,6 +15,9 @@
                  [adzerk/boot-cljs                 "1.7.170-2"      :scope "test"]
                  [crisptrutski/boot-cljs-test      "0.2.0-SNAPSHOT" :scope "test"]
                  [adzerk/boot-reload               "0.3.1"          :scope "test"]
+                 [adzerk/boot-cljs-repl            "0.3.0"]
+                 [com.cemerick/piggieback          "0.2.1"          :scope "test"]
+                 [weasel                           "0.7.0"          :scope "test"]
 
                  [org.dthume/data.interval-treeset "0.1.2"]
 
@@ -37,7 +40,8 @@
          '[reloaded.repl :refer [init start stop go reset]]
          '[othello-editor.systems :refer [dev-system prod-system]]
          '[danielsz.boot-environ :refer [environ]]
-         '[system.boot :refer [system run]])
+         '[system.boot :refer [system run]]
+         '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]])
 
 (task-options!
  pom {:project 'othello-editor
@@ -55,6 +59,7 @@
      (watch)
      (system :sys #'dev-system :auto-start true :hot-reload true :files ["src/clj" "src/cljs"])
      (reload)
+     (cljs-repl)
      (cljs :source-map true)
      (repl :server true)))
 
