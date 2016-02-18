@@ -21,9 +21,22 @@
 
 (defn active-element [] (.-activeElement js/document))
 
+(defn char-offset [node]
+  (loop [cur-node node, count 0]
+    (if-let [sibling (.-previousSibling cur-node)]
+      (if (= cur-node sibling)
+        nil
+        (recur sibling (+ count (.-length (.-textContent sibling)))))
+      count)))
+
 (defn current-selection []
-  (let [range (.getRangeAt (.getSelection js/window) 0)]
-    {:start-offset (.-startOffset range) :end-offset (.-endOffset range)}))
+  (let [selection (.getSelection js/window)
+        selection-node (.-anchorNode selection)
+        node (if (= 3 (.-nodeType selection-node)) (.-parentNode selection-node) selection-node)
+        offset (char-offset node)
+        range (.getRangeAt selection 0)]
+    {:start-offset (+ offset (.-startOffset range))
+     :end-offset   (+ offset (.-endOffset range))}))
 
 (def keydown-blacklist [8 37 38 39 40])
 
@@ -58,17 +71,21 @@
  :focus-block
  trim-v
  (fn [db [id]]
-   (assoc-in db [:editor :active-block-id] id)))
+   (let [active-author-id (get-in db [:editor :active-author-id])]
+     (assoc-in db [:editor :authors active-author-id :active-block-id] id))))
 
 (defn apply-style
-  [db {:keys [start-offset end-offset]} style]
-  (let [active-author-id (get-in db [:editor :active-author-id])
-        active-block-id  (get-in db [:editor :authors active-author-id :active-block-id])
-        current-attrs    (get-in db [:editor :blocks active-block-id :block/attributes])]
-    (as-> current-attrs $
-      (conj $ [[start-offset end-offset] style])
-      (sort range-sort $)
-      (assoc-in db [:editor :blocks active-block-id :block/attributes] $))))
+  [db {:keys [start-offset end-offset] :as range} style]
+    (let [active-author-id (get-in db [:editor :active-author-id])
+          active-block-id  (get-in db [:editor :authors active-author-id :active-block-id])
+          current-attrs    (get-in db [:editor :blocks active-block-id :block/attributes])]
+      (as-> current-attrs $
+        (conj $ [[start-offset end-offset] style])
+        (sort range-sort $)
+        (do (println $) $)
+        (styles/style-ranges $)
+        (do (println $) $)
+        (assoc-in db [:editor :blocks active-block-id :block/attributes] $))))
 
 (register-handler
  :selection/bold

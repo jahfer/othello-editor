@@ -4,13 +4,13 @@
   (compare a b))
 
 (defn- range-overlap [[a-start a-end :as a] [b-start b-end :as b]]
-  (when (>= 0 (- a-end b-start))
+  (when (<= 0 (- a-end b-start))
     [(if (identical? a-start b-start) [] [a-start (dec b-start)])
      [b-start (min a-end b-end)]
      (if (identical? a-end b-end) [] [(inc (min a-end b-end)) (max a-end b-end)])]))
 
 (defn- merge-ranges [{:keys [set] :as acc} [[this-start this-end] this-styles :as attribute]]
-  (let [sorted-set (sort range-sort set) 
+  (let [sorted-set (sort range-sort set)
         [[last-start last-end] last-styles] (last sorted-set) ;; slow!
         [pre overlap post] (range-overlap [last-start last-end] [this-start this-end])]
     (cond-> acc

@@ -1,8 +1,15 @@
+(ns othello-editor.scratch)
+
 (def attributes
   [[[1 7]   {:underline true}]
    [[2 5]   {:italic true}]
    [[4 12]  {:bold true}]
    [[13 15] {:italic true}]])
+
+(def attributes
+  [[[6 11]  {:bold true}]
+   [[6 7]   {:italic true}]
+   [[18 20] {:underline true}]])
 
 ;;; ------
 
@@ -10,13 +17,15 @@
   (compare a b))
 
 (defn range-overlap [[a-start a-end :as a] [b-start b-end :as b]]
-  (when (>= 0 (- a-end b-start))
+  (when (<= 0 (- a-end b-start))
     [(if (identical? a-start b-start) [] [a-start (dec b-start)])
      [b-start (min a-end b-end)]
      (if (identical? a-end b-end) [] [(inc (min a-end b-end)) (max a-end b-end)])]))
 
+(range-overlap [6 11] [6 7])
+
 (defn merge-ranges [{:keys [set] :as acc} [[this-start this-end] this-styles :as attribute]]
-  (let [sorted-set (sort range-sort set) 
+  (let [sorted-set (sort range-sort set)
         [[last-start last-end] last-styles] (last sorted-set) ;; slow!
         [pre overlap post] (range-overlap [last-start last-end] [this-start this-end])]
     (cond-> acc
@@ -37,6 +46,11 @@
       (reduce merge-ranges {:set (list (first $))} (rest $))
       (recur $))
     (sort range-sort set)))
+
+(comment
+  [[[6 7]   {:bold true :italic true}]
+   [[8 11]  {:bold true}]
+   [[18 20] {:underline true}])
 
 (comment
   {[1 1]   [:underline]
